@@ -142,6 +142,7 @@ export default {
                             return;
                         }
                         window.LS.notifyFader(result.data.message, 'well-lg bg-primary text-center');
+                        // TODO: Add Error Handling here. cause this is doing AJAX CALL.
                         this.$store.dispatch('updateObjects', result.data.newQuestionDetails);
                         LS.EventBus.$emit('updateSideBar', {updateQuestions:true});
                         $('#in_survey_common').trigger('lsStopLoading');
