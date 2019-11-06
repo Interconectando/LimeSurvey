@@ -164,7 +164,6 @@ export default {
                         this.loading = false;
                         window.LS.notifyFader(reject.data.message, 'well-lg bg-danger text-center');
                         this.$log.error(reject.data.error);
-                        setTimeout(()=>{window.location.reload();}, 2500);
                     }
                 )
             } else {
