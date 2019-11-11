@@ -1,7 +1,7 @@
 <?php
 
-class PreviewModalWidget extends CWidget {
-
+class PreviewModalWidget extends CWidget
+{
     //The name the widget will be rendered to, please make sure it is unique!
     public $widgetsJsName = "";
     //The title the widgets modal will have
@@ -42,48 +42,78 @@ class PreviewModalWidget extends CWidget {
 
     public $debug = false;
 
-    public function run() {
+    /**
+     * @todo document me
+     *
+     * @throws CException
+     */
+    public function run()
+    {
         //clean up the widgets name to be js friendly
-        $this->widgetsJsName = preg_replace('/[^a-zA-Z0-9_-]/','',$this->widgetsJsName);
+        $this->widgetsJsName = preg_replace('/[^a-zA-Z0-9_-]/', '', $this->widgetsJsName);
         $this->registerScripts();
     }
 
-
     /**
+     * @todo document me
+     *
      * @param bool $return
      *
      * @return string|void
      * @throws CException
      */
-    public function getModal($return=false){
-        if(preg_match("/modal/",$this->renderType)){
-
+    public function getModal($return = false)
+    {
+        if (preg_match("/modal/", $this->renderType)) {
             return $this->render($this->getView(), null, $return);
         }
         echo "";
         return;
     }
 
-    public function getButtonOrSelect($return=false){
-        if(preg_match("/modal/",$this->renderType)){
+    /**
+     * @todo document me
+     *
+     * @param bool $return
+     * @return string
+     * @throws CException
+     */
+    public function getButtonOrSelect($return = false)
+    {
+        if (preg_match("/modal/", $this->renderType)) {
             return $this->render("open_modal_button", null, $return);
         }
 
         return $this->render($this->view, null, $return);
     }
 
-    public function getView(){
-
-        switch( $this->renderType ) {
-            case 'simple' : return 'simple_select';
-            case 'group-simple' : return 'simple_grouped_select';
-            case 'group-modal' : return 'grouped_select_modal';
-            case 'modal' : //fallthrough
-            default: return 'select_modal';
+    /**
+     * @todo document me
+     *
+     * @return string
+     */
+    public function getView()
+    {
+        switch ($this->renderType) {
+            case 'simple':
+                return 'simple_select';
+            case 'group-simple':
+                return 'simple_grouped_select';
+            case 'group-modal':
+                return 'grouped_select_modal';
+            case 'modal': //fallthrough
+            default:
+                return 'select_modal';
         }
     }
 
-    private function registerScripts(){
+    /**
+     * @todo document me
+     *
+     * @throws CException
+     */
+    private function registerScripts()
+    {
         $oClientScript = App()->getClientScript();
         $basePath = dirname(__FILE__) . '/assets/';
 
