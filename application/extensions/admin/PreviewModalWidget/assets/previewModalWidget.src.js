@@ -43,14 +43,18 @@ class PreviewModalScript {
      *
      * @param itemData
      */
-    selectItem (itemData){
+    selectItem(itemData) {
+        console.log('SELECT ITEM DATA: ', itemData);
         $(`#selector__${this.widgetsJsName}-currentSelected`).html(itemData.title);
         $(`#selector__${this.widgetsJsName}--buttonText`).html(`${itemData.title} ${this.getForDebug(itemData.key)}`);
         $(`#selector__${this.widgetsJsName}-detailPage`).html(this.options.onGetDetails(itemData.itemArray.detailpage, itemData));
         this.inputItem.val(itemData.key);
         this.options.option = itemData.itemArray;
         this.options.value = itemData.key;
-    };
+        console.log('SELECT ITEM INPUT ITEM: ', this.inputItem);
+        console.log('SELECT ITEM OPTIONS: ', this.options);
+    }
+
     /**
      * triggered by clicking on an item in the selector
      *
@@ -61,6 +65,7 @@ class PreviewModalScript {
         $(`.selector__Item--select-${this.widgetsJsName}`).removeClass('mark-as-selected');
         $(ev.currentTarget).addClass('mark-as-selected');
         const itemData = $(ev.currentTarget).data('item-value');
+        console.log('Selected Item on Click: ', itemData);
         this.selectItem(itemData);
     }
 
@@ -71,14 +76,15 @@ class PreviewModalScript {
      */
     preSelectFromValue(value) {
         value = value || this.inputItem.val() || this.options.value;
+        console.log('Pre Selected From Value: ', value);
         return $(`.selector__Item--select-${this.widgetsJsName}[data-key='${value.toString().trim()}']`);
     }
 
     /**
      * event triggered when the modal opens
      */
-    onModalShown (){
-
+    onModalShown() {
+        console.log('onModalShown');
         const selectedItem = this.preSelectFromValue();
 
         if (selectedItem) {
@@ -91,7 +97,8 @@ class PreviewModalScript {
     /**
      * event triggered when the modal closes
      */
-    onModalClosed (){
+    onModalClosed() {
+        console.log('onModalClosed');
         $(this.modalItem).find('.panel-collapse.collapse').each((i, item) => {
             $(item).removeClass('in');
         });

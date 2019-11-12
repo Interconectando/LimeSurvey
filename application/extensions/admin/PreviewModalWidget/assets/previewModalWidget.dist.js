@@ -28,7 +28,7 @@ function () {
 
     this.widgetsJsName = widgetsJsName;
     this.modalItem = $("#selector__".concat(this.widgetsJsName, "-modal"));
-    this.inputItem = $("#selector__".concat(this.widgetsJsName)); //Define default settings 
+    this.inputItem = $("#selector__".concat(this.widgetsJsName)); //Define default settings
 
     var defaultSettings = {
       onUpdate: function onUpdate(value) {},
@@ -55,7 +55,8 @@ function () {
   }
   /**
    * Get the html snippet for the item data
-   * @param string key 
+   *
+   * @param key
    */
 
 
@@ -66,39 +67,50 @@ function () {
     }
     /**
      * select an Item
+     *
+     * @param itemData
      */
 
   }, {
     key: "selectItem",
     value: function selectItem(itemData) {
+      console.log('SELECT ITEM DATA: ', itemData);
       $("#selector__".concat(this.widgetsJsName, "-currentSelected")).html(itemData.title);
       $("#selector__".concat(this.widgetsJsName, "--buttonText")).html("".concat(itemData.title, " ").concat(this.getForDebug(itemData.key)));
       $("#selector__".concat(this.widgetsJsName, "-detailPage")).html(this.options.onGetDetails(itemData.itemArray.detailpage, itemData));
       this.inputItem.val(itemData.key);
       this.options.option = itemData.itemArray;
       this.options.value = itemData.key;
+      console.log('SELECT ITEM INPUT ITEM: ', this.inputItem);
+      console.log('SELECT ITEM OPTIONS: ', this.options);
     }
-  }, {
-    key: "selectItemClick",
-
     /**
      * triggered by clicking on an item in the selector
+     *
+     * @param ev
      */
+
+  }, {
+    key: "selectItemClick",
     value: function selectItemClick(ev) {
       console.ls.log("CURRENT SELECTED", $(ev.currentTarget));
       $(".selector__Item--select-".concat(this.widgetsJsName)).removeClass('mark-as-selected');
       $(ev.currentTarget).addClass('mark-as-selected');
       var itemData = $(ev.currentTarget).data('item-value');
+      console.log('Selected Item on Click: ', itemData);
       this.selectItem(itemData);
     }
-  }, {
-    key: "preSelectFromValue",
-
     /**
      * Workaround for the crazy person to use '*' as the short for a question type
+     *
+     * @param value
      */
+
+  }, {
+    key: "preSelectFromValue",
     value: function preSelectFromValue(value) {
       value = value || this.inputItem.val() || this.options.value;
+      console.log('Pre Selected From Value: ', value);
       return $(".selector__Item--select-".concat(this.widgetsJsName, "[data-key='").concat(value.toString().trim(), "']"));
     }
     /**
@@ -108,6 +120,7 @@ function () {
   }, {
     key: "onModalShown",
     value: function onModalShown() {
+      console.log('onModalShown');
       var selectedItem = this.preSelectFromValue();
 
       if (selectedItem) {
@@ -117,24 +130,25 @@ function () {
 
       this.options.onModalOpen();
     }
-  }, {
-    key: "onModalClosed",
-
     /**
      * event triggered when the modal closes
      */
+
+  }, {
+    key: "onModalClosed",
     value: function onModalClosed() {
+      console.log('onModalClosed');
       $(this.modalItem).find('.panel-collapse.collapse').each(function (i, item) {
         $(item).removeClass('in');
       });
       this.options.onModalClose();
     }
-  }, {
-    key: "bind",
-
     /**
      * bind to all necessary events
      */
+
+  }, {
+    key: "bind",
     value: function bind() {
       var _this = this;
 
