@@ -4,9 +4,9 @@ class PreviewModalScript {
         this.modalItem = $(`#selector__${this.widgetsJsName}-modal`);
         this.inputItem = $(`#selector__${this.widgetsJsName}`);
 
-        //Define default settings 
+        //Define default settings
         const defaultSettings = {
-            onUpdate: (value)=>{},
+            onUpdate: (value) => {},
             onReady: () => {},
             onModalClose: () => {},
             onModalOpen: () => {},
@@ -20,24 +20,28 @@ class PreviewModalScript {
         };
 
         const toBeEvaluated = ['onUpdate', 'onReady', 'onModalClose', 'onModalOpen', 'dataFilter', 'onGetDetails'];
-        $.each(transOptions, function(key,val){
-            if(toBeEvaluated.indexOf(key) > -1){
+        $.each(transOptions, function (key, val) {
+            if (toBeEvaluated.indexOf(key) > -1) {
                 transOptions[key] = new Function(...transOptions[key]);
             }
-        })
+        });
 
         this.options = $.extend({}, defaultSettings, transOptions);
     }
 
     /**
      * Get the html snippet for the item data
-     * @param string key 
+     *
+     * @param key
      */
     getForDebug(key) {
         return this.options.debug ? `<em class="small">${this.options.debugString} ${key} </em>` : '';
     }
+
     /**
      * select an Item
+     *
+     * @param itemData
      */
     selectItem (itemData){
         $(`#selector__${this.widgetsJsName}-currentSelected`).html(itemData.title);
@@ -49,19 +53,23 @@ class PreviewModalScript {
     };
     /**
      * triggered by clicking on an item in the selector
+     *
+     * @param ev
      */
-    selectItemClick (ev){
+    selectItemClick(ev) {
         console.ls.log("CURRENT SELECTED", $(ev.currentTarget));
         $(`.selector__Item--select-${this.widgetsJsName}`).removeClass('mark-as-selected');
         $(ev.currentTarget).addClass('mark-as-selected');
         const itemData = $(ev.currentTarget).data('item-value');
         this.selectItem(itemData);
-    };
+    }
 
     /**
      * Workaround for the crazy person to use '*' as the short for a question type
+     *
+     * @param value
      */
-    preSelectFromValue (value){
+    preSelectFromValue(value) {
         value = value || this.inputItem.val() || this.options.value;
         return $(`.selector__Item--select-${this.widgetsJsName}[data-key='${value.toString().trim()}']`);
     }
@@ -73,12 +81,13 @@ class PreviewModalScript {
 
         const selectedItem = this.preSelectFromValue();
 
-        if(selectedItem) {
+        if (selectedItem) {
             $(selectedItem).addClass('mark-as-selected');
             $(selectedItem).closest('div.panel-collapse').addClass('in');
         }
         this.options.onModalOpen();
-    };
+    }
+
     /**
      * event triggered when the modal closes
      */
@@ -87,31 +96,36 @@ class PreviewModalScript {
             $(item).removeClass('in');
         });
         this.options.onModalClose();
-    };
+    }
+
     /**
      * bind to all necessary events
      */
     bind() {
-        
-        if(this.options.secondaryInputElement != null) {
+        if (this.options.secondaryInputElement != null) {
             this.options.value = $(this.options.secondaryInputElement).val();
             
             $(this.options.secondaryInputElement).off('change.previewModal');
-            $(this.options.secondaryInputElement).on('change.previewModal', (e) => { 
-                this.selectItemClick(this.preSelectFromValue($(e.currentTarget).val()));                
-            })
+            $(this.options.secondaryInputElement).on('change.previewModal', (e) => {
+                this.selectItemClick(this.preSelectFromValue($(e.currentTarget).val()));
+            });
         }
 
-        if(/modal/.test(this.options.viewType)){
-            $(this.modalItem).on('hide.bs.modal', ()=>{ this.onModalClosed() });
-            $(this.modalItem).on('shown.bs.modal', ()=>{ this.onModalShown() });
-            $(`.selector__Item--select-${this.widgetsJsName}:not(.disabled)`).on('click', (ev)=>{this.selectItemClick(ev)});
+        if (/modal/.test(this.options.viewType)) {
+            $(this.modalItem).on('hide.bs.modal', () =>{
+                this.onModalClosed();
+            });
+            $(this.modalItem).on('shown.bs.modal', () => {
+                this.onModalShown();
+            });
+            $(`.selector__Item--select-${this.widgetsJsName}:not(.disabled)`).on('click', (ev) => {
+                this.selectItemClick(ev);
+            });
             $(`#selector__select-this-${this.widgetsJsName}`).on('click', () => {
                 this.options.onUpdate(this.options.value, this.options.option);
                 this.modalItem.modal('hide');
             });
         } else {
-            
             $('#in_survey_common').off('change.previewModal');
             $('#in_survey_common').on('change.previewModal', `#${this.widgetsJsName}`, (e) => {
                 this.options.onUpdate($(e.currentTarget).val());
