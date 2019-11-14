@@ -1,4 +1,8 @@
 @charset "UTF-8";
+#cpdbatt {
+  min-height: 100px;
+}
+
 .jcarousel-wrapper {
   margin: 20px auto;
   position: relative;
@@ -220,10 +224,6 @@ div.mappable-attribute-wrapper.paired.ui-state-disabled {
 
 /* Existing attribute column in CSV CPDB import */
 .centralatt {
-  min-height: 100px;
-}
-
-#cpdbatt {
   min-height: 100px;
 }
 
