@@ -198,8 +198,8 @@ export default {
                         setTimeout(
                             ()=>{
                                 if(!Boolean(rejected.data.noRedirect)) {
-                                    reject.data.redirectTo != undefined
-                                    ? window.location.href = reject.data.redirectTo
+                                    rejected.data.redirectTo != undefined
+                                    ? window.location.href = rejected.data.redirectTo
                                     : window.location.reload();
                                 }
                             },
