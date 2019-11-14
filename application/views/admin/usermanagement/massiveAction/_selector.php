@@ -13,13 +13,15 @@ $aActionsArray = array(
         array(
             'type'        => 'action',
             'action'      => 'delete',
-            'url'         =>  App()->createUrl('/admin/usermanagement/sa/batchDelete'),
+            'url'         =>  App()->createUrl('/admin/usermanagement/sa/deleteMultiple'),
             'iconClasses' => 'text-danger fa fa-trash',
             'text'        =>  gT('Delete'),
             'grid-reload' => 'yes',
             'actionType'    => 'modal',
             'modalType'     => 'yes-no',
             'keepopen'      => 'yes',
+            'showSelected'  => 'yes',
+            'selectedUrl'   => App()->createUrl('/admin/usermanagement/sa/renderSelectedItems/'),
             'sModalTitle'   => gT('Delete user'),
             'htmlModalBody' => gT('Are you sure you want to delete the selected user?'),
         ),
@@ -34,6 +36,8 @@ $aActionsArray = array(
             'actionType'    => 'modal',
             'modalType'     => 'yes-no',
             'keepopen'      => 'yes',
+            'showSelected'  => 'yes',
+            'selectedUrl'   => App()->createUrl('/admin/usermanagement/sa/renderSelectedItems/'),
             'sModalTitle'   => gT('Resend login data user'),
             'htmlModalBody' => gT('Are you sure you want to reset and resend selected users login data?'),
         ),
@@ -60,18 +64,19 @@ $aActionsArray = array(
 if(Permission::model()->hasGlobalPermission('users', 'update')) {
     // Mass Edit -> roles only for superadmins
     $aActionsArray['aActions'][] = array(
-        'type' => 'action',
-        'action' => 'batchaddtogroup',
-        'url' => App()->createUrl('/admin/usermanagement/sa/batchAddGroup'),
-        'iconClasses' => 'fa fa-users',
-        'text' => gT('Batch add to usergroup'),
-        'grid-reload' => 'yes',
+        'type'          => 'action',
+        'action'        => 'batchaddtogroup',
+        'url'           => App()->createUrl('/admin/usermanagement/sa/batchAddGroup'),
+        'iconClasses'   => 'fa fa-users',
+        'text'          => gT('Add to usergroup'),
+        'grid-reload'   => 'yes',
         //modal
-        'actionType' => 'modal',
-        'modalType'     => 'yes-no-lg',
+        'actionType'    => 'modal',
+        'modalType'     => 'yes-no',
         'keepopen'      => 'yes',
-        'sModalTitle'   => gT('Batch change permissions'),
-        'htmlFooterButtons' => [],
+        'showSelected'  => 'yes',
+        'selectedUrl'   => App()->createUrl('/admin/usermanagement/sa/renderSelectedItems/'),
+        'sModalTitle'   => gT('Add to usergroup'),
         'htmlModalBody' => App()->getController()->renderPartial('/admin/usermanagement/massiveAction/_addtousergroup', [], true)
     );
 }

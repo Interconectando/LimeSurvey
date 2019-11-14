@@ -7,6 +7,7 @@ import MainEditor from './components/mainEditor.vue';
 import GeneralSettings from './components/generalSettings.vue';
 import AdvancedSettings from './components/advancedSettings.vue';
 import LanguageSelector from './helperComponents/LanguageSelector.vue';
+import BootstrapToggle from 'vue-bootstrap-toggle'
 
 import runAjax from './mixins/runAjax.js';
 import eventRoot from './mixins/eventRoot.js';
@@ -20,13 +21,21 @@ export default {
         'generalsettings' : GeneralSettings,
         'advancedsettings' : AdvancedSettings,
         'languageselector' : LanguageSelector,
+        BootstrapToggle
     },
     data() {
         return {
             editQuestion: false,
             questionEditButton: window.questionEditButton,
             loading: true,
-            noCodeWarning: false
+            noCodeWarning: false,
+            switcherOptions: {
+                onstyle:"primary",
+                offstyle:"warning",
+                size:"normal",
+                on: this.translate("Yes"),
+                off: this.translate("No")
+            }
         }
     },
     computed: {
@@ -34,7 +43,7 @@ export default {
             return this.$store.state.alerts.length > 0;
         },
         isCreateQuestion(){
-            return this.$store.state.currentQuestion.qid == null;
+            return this.$store.state.currentQuestion.qid == null || this.initCopy;
         },
         questionGroupWithId(){
             return `${this.$store.state.currentQuestionGroupInfo[this.$store.state.activeLanguage].group_name} (GID: ${this.$store.state.currentQuestionGroupInfo.gid})`;
@@ -68,6 +77,26 @@ export default {
         },
         containsMultipleLanguages() {
             return (this.getLanguageCount > 1);
+        },
+        initCopy: {
+            get() { return this.$store.state.initCopy; },
+            set(nV) { this.$store.commit('setInitCopy', nV); }
+        },
+        copySubquestions: {
+            get() { return this.$store.state.copySubquestions; },
+            set(nV) { this.$store.commit('setCopySubquestions', nV); }
+        },
+        copyAnswerOptions: {
+            get() { return this.$store.state.copyAnswerOptions; },
+            set(nV) { this.$store.commit('setCopyAnswerOptions', nV); }
+        },
+        copyDefaultAnswers: {
+            get() { return this.$store.state.copyDefaultAnswers; },
+            set(nV) { this.$store.commit('setCopyDefaultAnswers', nV); }
+        },
+        copyAdvancedOptions: {
+            get() { return this.$store.state.copyAdvancedOptions; },
+            set(nV) { this.$store.commit('setCopyAdvancedOptions', nV); }
         },
     },
     watcher: {
@@ -159,11 +188,23 @@ export default {
                             LS.EventBus.$emit('setQuestionType', result.data.newQuestionDetails.question.type);
                         });
                     },
-                    (reject) => {
+                    (rejected) => {
                         $('#in_survey_common').trigger('lsStopLoading');
                         this.loading = false;
-                        window.LS.notifyFader(reject.data.message, 'well-lg bg-danger text-center');
-                        this.$log.error(reject.data.error);
+                        this.$log.error(rejected);
+                        if(rejected.data != undefined) {
+                            window.LS.notifyFader(rejected.data.message, 'well-lg bg-danger text-center');
+                        }
+                        setTimeout(
+                            ()=>{
+                                if(!Boolean(rejected.data.noRedirect)) {
+                                    reject.data.redirectTo != undefined
+                                    ? window.location.href = reject.data.redirectTo
+                                    : window.location.reload();
+                                }
+                            },
+                            2500
+                        );
                     }
                 )
             } else {
@@ -212,6 +253,7 @@ export default {
         },
     },
     created(){
+        this.initCopy = false;
         Promise.all([
             this.$store.dispatch('loadQuestion'),
             this.$store.dispatch('getQuestionTypes')
@@ -241,6 +283,16 @@ export default {
         LS.EventBus.$off('componentFormSubmit');
         LS.EventBus.$on('componentFormSubmit', (payload) => {
             this.submitCurrentState((payload.id == '#save-and-close-button'), payload.url != '#' ? payload.url : false);
+        });
+
+        LS.EventBus.$off('copyQuestion');
+        LS.EventBus.$on('copyQuestion', (payload) => {
+            this.initCopy = !this.initCopy;
+            if(this.initCopy) {
+                this.editQuestion = true;
+                LS.EventBus.$emit('doFadeEvent', true);
+                this.currentQuestionCode = this.currentQuestionCode+'Copy';
+            }
         });
     }
 }
@@ -281,6 +333,40 @@ export default {
         </div>
         <transition-group name="fade">
             <template v-if="!loading">
+                <div class="row" key="questioncode-block" v-if="initCopy">
+                    <div class="form-group col-lg-3 col-sm-6">
+                        <label class="ls-space margin right-5" for="copySubquestions">{{"Copy subquestions" | translate}}</label>
+                        <bootstrap-toggle
+                            id="copySubquestions"
+                            v-model="copySubquestions"
+                            :options="switcherOptions"
+                        />
+                    </div>
+                    <div class="form-group col-lg-3 col-sm-6">
+                        <label class="ls-space margin right-5" for="copyAnswerOptions">{{"Copy answer options" | translate}}</label>
+                        <bootstrap-toggle
+                            id="copyAnswerOptions"
+                            v-model="copyAnswerOptions"
+                            :options="switcherOptions"
+                        />
+                    </div>
+                    <div class="form-group col-lg-3 col-sm-6">
+                        <label class="ls-space margin right-5" for="copyDefaultAnswers">{{"Copy default answers" | translate}}</label>
+                        <bootstrap-toggle
+                            id="copyDefaultAnswers"
+                            v-model="copyDefaultAnswers"
+                            :options="switcherOptions"
+                        />
+                    </div>
+                    <div class="form-group col-lg-3 col-sm-6">
+                        <label class="ls-space margin right-5" for="copyAdvancedOptions">{{"Copy advanced options" | translate}}</label>
+                        <bootstrap-toggle
+                            id="copyAdvancedOptions"
+                            v-model="copyAdvancedOptions"
+                            :options="switcherOptions"
+                        />
+                    </div>
+                </div>
                 <div class="row" key="questioncode-block">
                     <div class="form-group col-sm-6">
                         <label for="questionCode">{{'Code' | translate }}</label>
@@ -288,7 +374,7 @@ export default {
                             type="text"
                             class="form-control"
                             id="questionCode"
-                            :readonly="!(editQuestion || isCreateQuestion)"
+                            :readonly="!(editQuestion || isCreateQuestion || initCopy)"
                             required="required"
                             v-model="currentQuestionCode"
                             @dblclick="setEditQuestion"
